@@ -168,7 +168,7 @@ export default class MakeCall extends React.Component {
                 this.activeCallTransferFeature = this.callAgent.feature(Features.ActiveCallTransfer);
                 try {
                     this.activeCallTransferFeature.on('activeCallsUpdated', (args) => {
-                        console.log(`activeCallsUpdated, activeCalls=${args.activeCallDetails}`);
+                        console.log(`activeCallsUpdated, activeCalls=`, args.activeCallDetails);
                         this.setState({activeCallDetails: args.activeCallDetails});
                     });
 
@@ -1015,30 +1015,43 @@ this.callAgent.on('incomingCall', async (args) => {
                             </MessageBar>
                         }
                         {
-                            this.state.activeCallDetails && !this.state.call && <MessageBar
-                                messageBarType={MessageBarType.warning}
-                                isMultiline={true}
-                                onDismiss={() => { this.setState({ activeCallDetails: undefined }) }}
-                                dismissButtonAriaLabel="Close">
-                                <div className="ms-Grid-row">
-                                    <b className="ms-Grid-col">You're in an active call!</b>
-                                    <div className="ms-Grid-col">
-                                        <DefaultButton  onClick={async () => {
-                                            const callOptions = await this.getCallOptions({video: false, micMuted: false});
-                                            const newCall = await this.activeCallTransferFeature.activeCallTransfer(this.state.activeCallDetails, {isTransfer: true, joinCallOptions: callOptions});
-                                            this.setState({call: newCall});
-                                        }}>Transfer to this device</DefaultButton>
-                                    </div>
-                                    <div className="ms-Grid-col">
-                                        <DefaultButton onClick={async () => {
-                                            const callOptions = await this.getCallOptions({video: false, micMuted: false});
-                                            const newCall = await this.activeCallTransferFeature.activeCallTransfer(this.state.activeCallDetails, {isTransfer: false, joinCallOptions: callOptions});
-                                            this.setState({call: newCall});
-                                        }}>Add this device</DefaultButton>
-                                    </div>
-                                    
-                                </div>
-                            </MessageBar>
+                            this.state.activeCallDetails ? <>
+                                {this.state.activeCallDetails.map((call) => {
+                                    let callTitle;
+                                    if ('organizerId' in call) {
+                                        callTitle = `Meeting with organizerId: ${call.organizerId}`;
+                                    } else {
+                                        const participantCount = call.participants.length;
+                                        callTitle = `Call with ${participantCount > 1 ? participantCount : call.participants[0]} participants`;
+                                    }
+                                    return (
+                                        call && !this.state.call && <MessageBar
+                                            messageBarType={MessageBarType.warning}
+                                            isMultiline={true}
+                                            onDismiss={() => { this.setState({ activeCallDetails: this.state.activeCallDetails.filter(c => c !== call) }) }}
+                                            dismissButtonAriaLabel="Close">
+                                            <div className="ms-Grid-row">
+                                                <b className="ms-Grid-col">You're in an active call!</b>
+                                                <b className="ms-Grid-col">{callTitle}</b>
+                                                <div className="ms-Grid-col">
+                                                    <DefaultButton  onClick={async () => {
+                                                        const callOptions = await this.getCallOptions({video: false, micMuted: false});
+                                                        const newCall = await this.activeCallTransferFeature.activeCallTransfer(call, {isTransfer: true, joinCallOptions: callOptions});
+                                                        this.setState({call: newCall});
+                                                    }}>Transfer to this device</DefaultButton>
+                                                </div>
+                                                <div className="ms-Grid-col">
+                                                    <DefaultButton onClick={async () => {
+                                                        const callOptions = await this.getCallOptions({video: false, micMuted: false});
+                                                        const newCall = await this.activeCallTransferFeature.activeCallTransfer(call, {isTransfer: false, joinCallOptions: callOptions});
+                                                        this.setState({call: newCall});
+                                                    }}>Add this device</DefaultButton>
+                                                </div>
+                                            </div>
+                                        </MessageBar>
+                                    );
+                                })}
+                            </> : <></>
                         }
                         {
                             !this.state.incomingCall && !this.state.call && !this.state.callSurvey &&
