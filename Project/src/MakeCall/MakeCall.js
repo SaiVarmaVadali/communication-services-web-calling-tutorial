@@ -177,7 +177,7 @@ export default class MakeCall extends React.Component {
                         this.setState({activeCallDetails: undefined});
                     });
                     const activeCalls = await this.activeCallTransferFeature.getActiveCallDetails();
-                    this.setState({ activeCallDetails: activeCalls.callId ? activeCalls : undefined });
+                    this.setState({ activeCallDetails: activeCalls.length > 0 ? activeCalls : undefined });
                 } catch (e) {
                     console.log('active call transfer not configured for this release version');
                 } 
@@ -1018,8 +1018,8 @@ this.callAgent.on('incomingCall', async (args) => {
                             this.state.activeCallDetails ? <>
                                 {this.state.activeCallDetails.map((call) => {
                                     let callTitle;
-                                    if ('organizerId' in call) {
-                                        callTitle = `Meeting with organizerId: ${call.organizerId}`;
+                                    if ('meetingLocator' in call) {
+                                        callTitle = `Meeting with organizerId: ${call.meetingLocator.organizerId}`;
                                     } else {
                                         const participantCount = call.participants.length;
                                         callTitle = `Call with ${participantCount > 1 ? participantCount : call.participants[0]} participants`;
