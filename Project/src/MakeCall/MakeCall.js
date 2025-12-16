@@ -165,8 +165,8 @@ export default class MakeCall extends React.Component {
                     await this.callClient.createTeamsCallAgent(tokenCredential) :
                     await this.callClient.createCallAgent(tokenCredential, { displayName: userDetails.displayName });
                 window.callAgent = this.callAgent;
-                this.activeCallTransferFeature = this.callAgent.feature(Features.ActiveCallTransfer);
                 try {
+                    this.activeCallTransferFeature = this.callAgent.feature(Features.ActiveCallTransfer);
                     this.activeCallTransferFeature.on('activeCallsUpdated', (args) => {
                         console.log(`activeCallsUpdated, activeCalls=`, args.activeCallDetails);
                         this.setState({activeCallDetails: args.activeCallDetails});
