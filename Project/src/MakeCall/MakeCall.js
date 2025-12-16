@@ -1028,6 +1028,7 @@ this.callAgent.on('incomingCall', async (args) => {
                                         call && !this.state.call && <MessageBar
                                             messageBarType={MessageBarType.warning}
                                             isMultiline={true}
+                                            key={call.id}
                                             onDismiss={() => { this.setState({ activeCallDetails: this.state.activeCallDetails.filter(c => c !== call) }) }}
                                             dismissButtonAriaLabel="Close">
                                             <div className="ms-Grid-row">
