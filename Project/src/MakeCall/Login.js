@@ -50,7 +50,6 @@ export default class Login extends React.Component {
             isTeamsUser: false,
             isEntraUser: false,
             isJoinOnlyToken: false,
-            headsetEnhancement: false,
         }
     }
 
@@ -122,8 +121,7 @@ export default class Login extends React.Component {
                 proxy: this.state.proxy,
                 customTurn: this.state.customTurn,
                 isTeamsUser: this.state.isTeamsUser,
-                isEntraUser: this.state.isEntraUser,
-                headsetEnhancement: this.state.headsetEnhancement
+                isEntraUser: this.state.isEntraUser
             });
         }
         console.log('Login response: ', this.userDetailsResponse);
@@ -213,8 +211,7 @@ export default class Login extends React.Component {
                     displayName: this.displayName,
                     clientTag:this.clientTag,
                     proxy: this.state.proxy,
-                    customTurn: this.state.customTurn,
-                    headsetEnhancement: this.state.headsetEnhancement
+                    customTurn: this.state.customTurn
                 });
                 this._callAgentInitPromise = new Promise((resolve) => { this._callAgentInitPromiseResolve = resolve });
                 await this._callAgentInitPromise;
@@ -706,15 +703,6 @@ const isSupportedEnvironment = this.environmentInfo.isSupportedEnvironment;
                                                         label='Join only token'
                                                         checked={this.state.isJoinOnlyToken}
                                                         onChange={(e, isChecked) => this.setState({isJoinOnlyToken: isChecked})} />    
-                                                    </div>
-                                                </div>
-                                                <div className="ms-Grid-row">
-                                                    <div className="ms-Grid-col">
-                                                    <Checkbox 
-                                                        className='mt-3'
-                                                        label='Headset Enhancement'
-                                                        checked={this.state.headsetEnhancement}
-                                                        onChange={(e, isChecked) => this.setState({headsetEnhancement: isChecked})} />    
                                                     </div>
                                                 </div>
                                                 <div className="ms-Grid-row">
