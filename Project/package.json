@@ -26,7 +26,9 @@
     "start-local": "webpack-dev-server --port 5000 --mode development",
     "build-local": "webpack --mode development",
     "start": "webpack-dev-server --host 0.0.0.0",
-    "build": "webpack"
+    "build": "webpack --env all",
+    "build:esm": "webpack --env esm --mode production",
+    "build:umd": "webpack --env umd --mode production"
   },
   "devDependencies": {
     "@babel/core": "^7.8.7",

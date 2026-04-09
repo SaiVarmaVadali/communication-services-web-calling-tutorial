@@ -20,7 +20,6 @@ const communicationIdentityClient = new  CommunicationIdentityClient(config.conn
 
 const PORT = process.env.port || 8080;
 
-
 const oneSignalRegistrationTokenToAcsUserAccesTokenMap = new Map();
 const registerCommunicationUserForOneSignal = async (communicationAccessToken, communicationUserIdentifier) => {
     const oneSignalRegistrationToken = generateGuid();
@@ -78,8 +77,10 @@ const getACSAccessTokenInfo = async (aadToken, userObjectId) => {
     return tokenResponse;
 }
 
-// comment devServer.webSocketServer: false to enable hot reloading
-module.exports = {
+const path = require('path');
+
+// Base configuration shared between ESM and UMD builds
+const baseConfig = {
     devtool: 'inline-source-map',
     mode: 'development',
     entry: "./src/index.js",
@@ -110,6 +111,61 @@ module.exports = {
                 use: ["style-loader", "css-loader"]
             }
         ]
+    }
+};
+
+// ESM bundle configuration
+const esmConfig = {
+    ...baseConfig,
+    name: 'esm',
+    output: {
+        filename: 'bundle.js',
+        chunkFilename: '[name].[contenthash].js',
+        path: path.resolve(__dirname, 'dist/esm'),
+        publicPath: '/esm/',
+        module: true,
+        library: {
+            type: 'module'
+        },
+        environment: {
+            module: true,
+            dynamicImport: true
+        }
+    },
+    experiments: {
+        outputModule: true
+    },
+    plugins: [
+        new HtmlWebPackPlugin({
+            template: "./public/index.html",
+            filename: "../index.html",
+            inject: false
+        })
+    ]
+};
+
+// UMD bundle configuration
+const umdConfig = {
+    ...baseConfig,
+    name: 'umd',
+    output: {
+        filename: 'bundle.js',
+        chunkFilename: '[name].[contenthash].js',
+        path: path.resolve(__dirname, 'dist/umd'),
+        publicPath: '/umd/'
+    },
+    plugins: []
+};
+
+// comment devServer.webSocketServer: false to enable hot reloading
+// Dev server configuration (uses UMD by default, ESM with ?bundle=esm)
+const devServerConfig = {
+    ...baseConfig,
+    output: {
+        filename: 'bundle.js',
+        chunkFilename: '[name].[contenthash].js',
+        path: path.resolve(__dirname, 'dist'),
+        publicPath: '/'
     },
     plugins: [
         new HtmlWebPackPlugin({
@@ -350,4 +406,23 @@ module.exports = {
             return middlewares;
         }
     }
+};
+
+// Export configuration based on environment variable
+// npm run build:esm -> ESM bundle
+// npm run build:umd -> UMD bundle  
+// npm run build -> Both bundles
+// npm start -> Dev server
+module.exports = (env, argv) => {
+    if (env && env.esm) {
+        return esmConfig;
+    }
+    if (env && env.umd) {
+        return umdConfig;
+    }
+    if (env && env.all) {
+        return [esmConfig, umdConfig];
+    }
+    // Default: dev server config
+    return devServerConfig;
 };
