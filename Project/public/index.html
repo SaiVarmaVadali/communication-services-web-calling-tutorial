@@ -24,9 +24,9 @@
         
         if (bundleType === 'esm') {
           script.type = 'module';
-          script.src = '/esm/bundle.js';
+          script.src = './esm/bundle.js';
         } else {
-          script.src = '/umd/bundle.js';
+          script.src = './umd/bundle.js';
         }
         
         document.body.appendChild(script);
