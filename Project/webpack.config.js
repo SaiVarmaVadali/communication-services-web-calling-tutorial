@@ -154,23 +154,31 @@ const umdConfig = {
         path: path.resolve(__dirname, 'dist/umd'),
         publicPath: '/umd/'
     },
-    plugins: []
+    plugins: [
+        new HtmlWebPackPlugin({
+            template: "./public/index.html",
+            filename: "../index.html",
+            inject: false
+        })
+    ]
 };
 
 // comment devServer.webSocketServer: false to enable hot reloading
 // Dev server configuration (uses UMD by default, ESM with ?bundle=esm)
 const devServerConfig = {
     ...baseConfig,
+    name: 'umd',
     output: {
         filename: 'bundle.js',
         chunkFilename: '[name].[contenthash].js',
-        path: path.resolve(__dirname, 'dist'),
-        publicPath: '/'
+        path: path.resolve(__dirname, 'dist/umd'),
+        publicPath: '/umd/'
     },
     plugins: [
         new HtmlWebPackPlugin({
             template: "./public/index.html",
-            filename: "./index.html"
+            filename: "../index.html",
+            inject: false
         })
     ],
     devServer: {
@@ -412,7 +420,7 @@ const devServerConfig = {
 // npm run build:esm -> ESM bundle
 // npm run build:umd -> UMD bundle  
 // npm run build -> Both bundles
-// npm start -> Dev server
+// npm start -> Dev server (both ESM and UMD, switch via ?bundle=esm)
 module.exports = (env, argv) => {
     if (env && env.esm) {
         return esmConfig;
@@ -423,6 +431,6 @@ module.exports = (env, argv) => {
     if (env && env.all) {
         return [esmConfig, umdConfig];
     }
-    // Default: dev server config
-    return devServerConfig;
+    // Default: dev server with both ESM and UMD bundles
+    return [esmConfig, devServerConfig];
 };
