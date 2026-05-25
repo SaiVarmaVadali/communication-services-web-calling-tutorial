@@ -150,9 +150,19 @@ const umdConfig = {
     name: 'umd',
     output: {
         filename: 'bundle.js',
-        chunkFilename: '[name].[contenthash].js',
         path: path.resolve(__dirname, 'dist/umd'),
         publicPath: '/umd/'
+    },
+    module: {
+        ...baseConfig.module,
+        parser: {
+            javascript: {
+                dynamicImportMode: 'eager'
+            }
+        }
+    },
+    optimization: {
+        splitChunks: false
     },
     plugins: [
         new HtmlWebPackPlugin({
@@ -170,9 +180,19 @@ const devServerConfig = {
     name: 'umd',
     output: {
         filename: 'bundle.js',
-        chunkFilename: '[name].[contenthash].js',
         path: path.resolve(__dirname, 'dist/umd'),
         publicPath: '/umd/'
+    },
+    module: {
+        ...baseConfig.module,
+        parser: {
+            javascript: {
+                dynamicImportMode: 'eager'
+            }
+        }
+    },
+    optimization: {
+        splitChunks: false
     },
     plugins: [
         new HtmlWebPackPlugin({
